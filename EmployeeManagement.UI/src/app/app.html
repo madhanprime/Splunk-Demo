@@ -1,0 +1,25 @@
+<header class="app-header glass-panel">
+  <div class="header-container">
+    <div class="brand">
+      <div class="brand-icon">⚡</div>
+      <div class="brand-text">
+        <span class="title">Employee Portal</span>
+        <span class="subtitle">Splunk Telemetry Demo Project</span>
+      </div>
+    </div>
+
+    <nav class="nav-links">
+      <a routerLink="/employees" routerLinkActive="active" class="nav-item">Employees</a>
+      <a routerLink="/login" routerLinkActive="active" class="nav-item">Login Page</a>
+    </nav>
+
+    <div class="header-status">
+      <span class="status-indicator"></span>
+      <span class="status-text">Splunk Logging Active</span>
+    </div>
+  </div>
+</header>
+
+<main class="main-content">
+  <router-outlet></router-outlet>
+</main>

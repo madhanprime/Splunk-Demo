@@ -1,0 +1,160 @@
+<div class="dashboard-container">
+  <!-- Top Telemetry & Anomaly Trigger Bar -->
+  <div class="glass-panel telemetry-bar">
+    <div class="telemetry-info">
+      <span class="pulse-icon">⚡</span>
+      <div>
+        <h4>Splunk Telemetry Generator</h4>
+        <p>Trigger live API requests and anomalies to inspect in Splunk SPL Search & Dashboards</p>
+      </div>
+    </div>
+    <div class="telemetry-buttons">
+      <button (click)="triggerAnomaly('slow')" class="btn-warning-glow">⏳ Trigger 2.5s Latency</button>
+      <button (click)="triggerAnomaly('error500')" class="btn-error-glow">🔥 Trigger 500 Error</button>
+      <button (click)="triggerAnomaly('db-timeout')" class="btn-error-glow">💾 DB Timeout</button>
+      <button (click)="triggerAnomaly('unauthorized')" class="btn-warn-glow">🔒 401 Unauthorized</button>
+    </div>
+  </div>
+
+  <div class="content-grid">
+    <!-- Main Employee Table Section -->
+    <div class="glass-panel table-section">
+      <div class="table-header">
+        <div>
+          <h3>Employee Directory</h3>
+          <p>Real-time database records via .NET Web API</p>
+        </div>
+        <button (click)="openCreateModal()" class="btn-primary">+ Add Employee</button>
+      </div>
+
+      <!-- Filters -->
+      <div class="filters-row">
+        <input type="text" [(ngModel)]="searchTerm" (keyup.enter)="loadEmployees()" class="input-control" placeholder="Search name or email..." />
+        
+        <select [(ngModel)]="selectedDepartment" (change)="loadEmployees()" class="input-control select-control">
+          <option value="">All Departments</option>
+          <option value="Engineering">Engineering</option>
+          <option value="Security">Security</option>
+          <option value="Product">Product</option>
+          <option value="Data Analytics">Data Analytics</option>
+        </select>
+
+        <button (click)="loadEmployees()" class="btn-outline">Search</button>
+      </div>
+
+      <!-- Employee Table -->
+      <div class="table-responsive">
+        <table class="custom-table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Department</th>
+              <th>Role</th>
+              <th>Salary</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let emp of employees">
+              <td class="emp-id">#{{ emp.id }}</td>
+              <td class="emp-name">{{ emp.firstName }} {{ emp.lastName }}</td>
+              <td class="emp-email">{{ emp.email }}</td>
+              <td><span class="dept-chip">{{ emp.department }}</span></td>
+              <td>{{ emp.role }}</td>
+              <td class="emp-salary">${{ emp.salary | number }}</td>
+              <td class="actions-cell">
+                <button (click)="openEditModal(emp)" class="action-btn edit">✏️</button>
+                <button (click)="deleteEmployee(emp.id)" class="action-btn delete">🗑️</button>
+              </td>
+            </tr>
+            <tr *ngIf="employees.length === 0 && !isLoading">
+              <td colspan="7" class="empty-state">No employee records found.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Live Telemetry Log Stream Side Panel -->
+    <div class="glass-panel log-feed-section">
+      <div class="log-feed-header">
+        <h4>📡 Live Request Stream</h4>
+        <span class="live-dot">● LIVE</span>
+      </div>
+      <p class="feed-sub">Every request sends structured JSON to <code>./logs/employee-app-*.json</code></p>
+
+      <div class="log-items">
+        <div *ngFor="let log of telemetryLogs" class="log-card">
+          <div class="log-top">
+            <span [class]="'badge badge-' + log.status">HTTP {{ log.status }}</span>
+            <span class="log-time">{{ log.time }}</span>
+          </div>
+          <div class="log-type">{{ log.type }}</div>
+          <div class="log-meta">
+            <span>Latency: <strong>{{ log.latencyMs }}ms</strong></span>
+          </div>
+          <div class="log-msg">{{ log.message }}</div>
+        </div>
+        <div *ngIf="telemetryLogs.length === 0" class="no-logs">
+          Perform an action or click a telemetry button to stream logs!
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal for Create/Edit -->
+<div class="modal-overlay" *ngIf="showModal">
+  <div class="glass-panel modal-card">
+    <div class="modal-header">
+      <h3>{{ isEditing ? 'Edit Employee' : 'Add New Employee' }}</h3>
+      <button (click)="closeModal()" class="close-btn">&times;</button>
+    </div>
+
+    <form (ngSubmit)="saveEmployee()">
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" [(ngModel)]="currentEmployee.firstName" name="firstName" class="input-control" required />
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" [(ngModel)]="currentEmployee.lastName" name="lastName" class="input-control" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" [(ngModel)]="currentEmployee.email" name="email" class="input-control" required />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Department</label>
+          <select [(ngModel)]="currentEmployee.department" name="department" class="input-control">
+            <option value="Engineering">Engineering</option>
+            <option value="Security">Security</option>
+            <option value="Product">Product</option>
+            <option value="Data Analytics">Data Analytics</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Salary ($)</label>
+          <input type="number" [(ngModel)]="currentEmployee.salary" name="salary" class="input-control" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Role</label>
+        <input type="text" [(ngModel)]="currentEmployee.role" name="role" class="input-control" required />
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" (click)="closeModal()" class="btn-outline">Cancel</button>
+        <button type="submit" class="btn-primary">Save & Log to Splunk</button>
+      </div>
+    </form>
+  </div>
+</div>

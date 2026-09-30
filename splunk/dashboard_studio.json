@@ -1,0 +1,152 @@
+{
+  "visualizations": {
+    "viz_total_requests": {
+      "type": "splunk.singlevalue",
+      "dataSources": {
+        "primary": "ds_total_requests"
+      },
+      "title": "Total Requests",
+      "options": {
+        "majorColor": "#38bdf8"
+      }
+    },
+    "viz_total_errors": {
+      "type": "splunk.singlevalue",
+      "dataSources": {
+        "primary": "ds_total_errors"
+      },
+      "title": "Total Errors (4xx / 5xx)",
+      "options": {
+        "majorColor": "#ef4444"
+      }
+    },
+    "viz_avg_latency": {
+      "type": "splunk.singlevalue",
+      "dataSources": {
+        "primary": "ds_avg_latency"
+      },
+      "title": "Avg Response Time (ms)",
+      "options": {
+        "majorColor": "#10b981",
+        "unit": "ms"
+      }
+    },
+    "viz_traffic_chart": {
+      "type": "splunk.area",
+      "dataSources": {
+        "primary": "ds_traffic_chart"
+      },
+      "title": "Traffic Volume & Errors Over Time",
+      "options": {}
+    },
+    "viz_endpoint_table": {
+      "type": "splunk.table",
+      "dataSources": {
+        "primary": "ds_endpoint_table"
+      },
+      "title": "Endpoint Response Performance",
+      "options": {}
+    }
+  },
+  "dataSources": {
+    "ds_total_requests": {
+      "type": "ds.search",
+      "options": {
+        "query": "index=\"employee-app\" | stats count"
+      }
+    },
+    "ds_total_errors": {
+      "type": "ds.search",
+      "options": {
+        "query": "index=\"employee-app\" StatusCode>=400 | stats count"
+      }
+    },
+    "ds_avg_latency": {
+      "type": "ds.search",
+      "options": {
+        "query": "index=\"employee-app\" | stats avg(ResponseTimeMs) as avg_latency | eval avg_latency=round(avg_latency,1)"
+      }
+    },
+    "ds_traffic_chart": {
+      "type": "ds.search",
+      "options": {
+        "query": "index=\"employee-app\" | timechart span=5m count as Requests, count(eval(StatusCode>=400)) as Errors"
+      }
+    },
+    "ds_endpoint_table": {
+      "type": "ds.search",
+      "options": {
+        "query": "index=\"employee-app\" | stats count, avg(ResponseTimeMs) as Avg_ms, max(ResponseTimeMs) as Max_ms by Method Endpoint | eval Avg_ms=round(Avg_ms, 1)"
+      }
+    }
+  },
+  "defaults": {
+    "dataSources": {
+      "ds.search": {
+        "options": {
+          "queryParameters": {
+            "earliest": "-24h@h",
+            "latest": "now"
+          }
+        }
+      }
+    }
+  },
+  "layout": {
+    "type": "absolute",
+    "options": {
+      "width": 1240,
+      "height": 900,
+      "display": "auto-scale"
+    },
+    "structure": [
+      {
+        "item": "viz_total_requests",
+        "position": {
+          "x": 20,
+          "y": 20,
+          "w": 380,
+          "h": 150
+        }
+      },
+      {
+        "item": "viz_total_errors",
+        "position": {
+          "x": 420,
+          "y": 20,
+          "w": 380,
+          "h": 150
+        }
+      },
+      {
+        "item": "viz_avg_latency",
+        "position": {
+          "x": 820,
+          "y": 20,
+          "w": 380,
+          "h": 150
+        }
+      },
+      {
+        "item": "viz_traffic_chart",
+        "position": {
+          "x": 20,
+          "y": 190,
+          "w": 1180,
+          "h": 320
+        }
+      },
+      {
+        "item": "viz_endpoint_table",
+        "position": {
+          "x": 20,
+          "y": 530,
+          "w": 1180,
+          "h": 340
+        }
+      }
+    ]
+  },
+  "title": "Employee App Monitoring Dashboard",
+  "description": "Real-time metrics and API telemetry for Employee Management application"
+}

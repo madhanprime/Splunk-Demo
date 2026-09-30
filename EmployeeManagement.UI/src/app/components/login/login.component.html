@@ -1,0 +1,38 @@
+<div class="login-wrapper">
+  <div class="glass-panel login-card">
+    <div class="login-header">
+      <div class="splunk-logo-badge">SPLUNK DEMO</div>
+      <h2>Employee App Access</h2>
+      <p>Log in to test API requests and trigger Splunk log events</p>
+    </div>
+
+    <form (ngSubmit)="onLogin()">
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" [(ngModel)]="username" name="username" class="input-control" placeholder="admin" required />
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" [(ngModel)]="password" name="password" class="input-control" placeholder="••••••••" required />
+      </div>
+
+      <div class="alert success" *ngIf="successMessage">
+        ✅ {{ successMessage }}
+      </div>
+
+      <div class="alert danger" *ngIf="errorMessage">
+        ⚠️ {{ errorMessage }}
+      </div>
+
+      <button type="submit" class="btn-primary btn-full" [disabled]="isLoading">
+        <span *ngIf="!isLoading">Sign In</span>
+        <span *ngIf="isLoading">Authenticating...</span>
+      </button>
+    </form>
+
+    <div class="login-footer">
+      <p>Tip: Change password to trigger a <strong>401 Unauthorized</strong> event in Splunk!</p>
+    </div>
+  </div>
+</div>
