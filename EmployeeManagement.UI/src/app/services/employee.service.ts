@@ -7,7 +7,9 @@ import { Employee, LoginRequest, LoginResponse } from '../models/employee.model'
   providedIn: 'root'
 })
 export class EmployeeService {
-  private apiUrl = 'http://localhost:5000/api';
+  private apiUrl = (typeof window !== 'undefined' && window.location.hostname === 'localhost' && window.location.port === '4200')
+    ? 'http://localhost:5000/api'
+    : '/api';
 
   constructor(private http: HttpClient) {}
 

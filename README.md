@@ -103,7 +103,7 @@ npx ng serve --port 4200 --open
 
 ---
 
-### 3. Spin Up Splunk Enterprise via Docker
+### 3. Spin Up Splunk Enterprise via Docker (Local APM Monitoring)
 ```bash
 cd splunk
 docker-compose up -d
@@ -111,6 +111,30 @@ docker-compose up -d
 - Splunk Web Interface: **[http://localhost:8000](http://localhost:8000)**
 - **Username**: `admin`
 - **Password**: `SplunkPassword123!`
+
+---
+
+## ☁️ Deploy to Render (Cloud Hosting)
+
+This project is optimized for deployment to **[Render.com](https://render.com/)** using Docker:
+
+### Method 1: Automatic Blueprint (1-Click)
+1. Push this repository to your GitHub account.
+2. In your Render Dashboard, click **New** → **Blueprint**.
+3. Connect your GitHub repository.
+4. Render will automatically detect [`render.yaml`](./render.yaml) and configure the service.
+5. Click **Apply**.
+
+### Method 2: Manual Web Service
+1. In Render Dashboard, click **New +** → **Web Service**.
+2. Connect your GitHub repository.
+3. Choose **Docker** as the Runtime.
+4. Set **Dockerfile Path**: `./Dockerfile` (or `EmployeeManagement.Api/Dockerfile` for backend-only).
+5. Set **Instance Type**: **Free**.
+6. Under **Advanced** → **Health Check Path**: `/api/employees`.
+7. Click **Deploy Web Service**!
+
+> **Note:** Render dynamically injects the `$PORT` environment variable (default: `10000`). Our Dockerfile and ASP.NET Core `Program.cs` automatically bind to `0.0.0.0:$PORT` for zero-downtime deployment.
 
 ---
 

@@ -47,6 +47,10 @@ builder.Services.AddCors(options =>
     });
 });
 
+// Configure Port dynamically for Cloud Platforms (Render, Fly.io, Azure, Docker)
+var port = Environment.GetEnvironmentVariable("PORT") ?? "5000";
+builder.WebHost.UseUrls($"http://0.0.0.0:{port}");
+
 var app = builder.Build();
 
 // Ensure Database & Seed Data are created on startup
@@ -57,11 +61,15 @@ using (var scope = app.Services.CreateScope())
 }
 
 // 3. Configure HTTP request pipeline
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI(c =>
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Employee Management API v1");
+    c.RoutePrefix = "swagger";
+});
+
+app.UseDefaultFiles();
+app.UseStaticFiles();
 
 app.UseCors("AllowAngular");
 
@@ -71,7 +79,8 @@ app.UseMiddleware<RequestLoggingMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapFallbackToFile("index.html");
 
-Log.Information("EmployeeManagement.Api started on environment {Environment}", app.Environment.EnvironmentName);
+Log.Information("EmployeeManagement.Api started on environment {Environment} listening on port {Port}", app.Environment.EnvironmentName, port);
 
 app.Run();

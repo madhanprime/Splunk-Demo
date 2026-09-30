@@ -1,0 +1,15 @@
+# ========================================================
+# Render Blueprint (Infrastructure-as-Code)
+# Documentation: https://render.com/docs/blueprint-spec
+# ========================================================
+services:
+  - type: web
+    name: employee-management-splunk-demo
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    region: oregon
+    healthCheckPath: /api/employees
+    envVars:
+      - key: ASPNETCORE_ENVIRONMENT
+        value: Production

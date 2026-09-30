@@ -1,0 +1,18 @@
+# .dockerignore
+**/.git
+**/.github
+**/bin
+**/obj
+**/node_modules
+**/.angular
+**/dist
+**/*.db
+**/*.db-shm
+**/*.db-wal
+**/logs/*.json
+**/logs/*.log
+!**/logs/.gitkeep
+**/.vscode
+**/.idea
+.DS_Store
+Thumbs.db
